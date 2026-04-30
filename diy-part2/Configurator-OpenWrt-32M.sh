@@ -295,9 +295,9 @@ CONFIG_PACKAGE_kmod-usb-serial-ch341=m
 CONFIG_PACKAGE_luci-app-upnp=y
 # ----------STAT_luci-app-statistics
 CONFIG_PACKAGE_luci-app-statistics=y
-# ----------Utilities_bind
-CONFIG_PACKAGE_bind-dig=y
-CONFIG_PACKAGE_bind-host=y
+# ----------Utilities_knot
+CONFIG_PACKAGE_knot-dig=y
+CONFIG_PACKAGE_knot-host=y
 # ----------Utilities_e2fsprogs
 CONFIG_PACKAGE_e2fsprogs=y
 # ----------Utilities_fdisk
