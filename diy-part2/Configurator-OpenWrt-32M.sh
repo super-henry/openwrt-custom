@@ -303,7 +303,7 @@ CONFIG_PACKAGE_e2fsprogs=y
 # ----------Utilities_fdisk
 CONFIG_PACKAGE_fdisk=y
 # ----------Utilities_nettool
-CONFIG_PACKAGE_ca-certificates=y
+CONFIG_PACKAGE_ca-certificates=m
 CONFIG_PACKAGE_ethtool=y
 CONFIG_PACKAGE_luci-app-iperf3-server=y
 CONFIG_PACKAGE_socat=y
