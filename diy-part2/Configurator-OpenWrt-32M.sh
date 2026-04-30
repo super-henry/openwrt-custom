@@ -46,6 +46,10 @@ modification() {
     find -type f -path '*/luci-app-easymesh/Makefile' -print -exec sed -i 's/openssl/mbedtls/w /dev/stdout' {} \;
 
     echo
+    echo '[MOD] 更换 ttyd 的依赖 openssl 为 mbedtls'
+    find -type f -path '*/ttyd/Makefile' -print -exec sed -i -e 's/+libopenssl \+//' -e 's/libwebsockets-full/libwebsockets-mbedtls/g' -e 'w /dev/stdout' {} \;
+
+    echo
     echo '[MOD] 除去 luci-app-dockerman 的架构限制'
     find -type f -path '*/luci-app-dockerman/Makefile' -print -exec sed -i 's#@(aarch64||arm||x86_64)##w /dev/stdout' {} \;
     find -type f -path '*/luci-lib-docker/Makefile' -print -exec sed -i 's#@(aarch64||arm||x86_64)##w /dev/stdout' {} \;
