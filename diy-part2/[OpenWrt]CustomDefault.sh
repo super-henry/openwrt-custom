@@ -8,6 +8,7 @@ uci commit fstab
 
 # 更换腾讯源
 sed -i -e 's#downloads.openwrt.org#mirrors.cloud.tencent.com/openwrt#g' -e '/kenzo/d' /etc/opkg/distfeeds.conf
+sed -i -e 's#downloads.openwrt.org#mirrors.cloud.tencent.com/openwrt#g' -e '/kenzo/d' /etc/apk/repositories.d/distfeeds.list
 # 修改默认密码为password
 # sed -i 's/root::0:0:99999:7:::/root:$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.:0:0:99999:7:::/g' /etc/shadow
 
