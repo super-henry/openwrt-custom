@@ -50,6 +50,14 @@ modification() {
     find -type f -path '*/ttyd/Makefile' -print -exec sed -i -e 's/+libopenssl \+//' -e 's/libwebsockets-full/libwebsockets-mbedtls/g' -e 'w /dev/stdout' {} \;
 
     echo
+    echo '[MOD] 为 libwebsockets-mbedtls 增加 libuv 支持'
+    find -type f -path '*/libwebsockets/Makefile' -print -exec sed -i \
+        -e '/^[[:space:]]*DEPENDS.*+libmbedtls/ s/$/ +libuv/' \
+        -e '/    CMAKE_OPTIONS += -DLWS_WITH_MBEDTLS=1$/a\' \
+        -e '    CMAKE_OPTIONS += -DLWS_WITH_LIBUV=ON' \
+        -e 'w /dev/stdout' {} \;
+
+    echo
     echo '[MOD] 除去 luci-app-dockerman 的架构限制'
     find -type f -path '*/luci-app-dockerman/Makefile' -print -exec sed -i 's#@(aarch64||arm||x86_64)##w /dev/stdout' {} \;
     find -type f -path '*/luci-lib-docker/Makefile' -print -exec sed -i 's#@(aarch64||arm||x86_64)##w /dev/stdout' {} \;
