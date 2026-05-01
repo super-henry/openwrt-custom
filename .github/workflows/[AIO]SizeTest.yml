@@ -105,8 +105,8 @@ jobs:
         echo '====================测试目录===================='
         grep '@' "${SEQ_FILE}" -n | cat -n
 
-        # 从DIY_P2_SH中截取型号信息
-        grep '^CONFIG_TARGET.*DEVICE.*=y' "${DIY_P2_SH}" | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+        # 从设备定义文件中截取型号信息（适配新架构：DIY_P2_SH 现为统一入口 _framework.sh）
+        grep '^CONFIG_TARGET.*DEVICE.*=y' "$GITHUB_WORKSPACE/diy-part2/_device/${DEVICE_NAME}.sh" | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "::notice title=Device@.config:: $(cat DEVICE_NAME)" && echo "DEVICE_NAME=$(cat DEVICE_NAME)" >> $GITHUB_ENV
 
     # 分任务
