@@ -8,9 +8,13 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/[Lean's LEDE]HC5661-part2.sh"
+        DIY_P2_SH="diy-part2/_framework.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/lean's%2520lede")
         SEQ_FILE="testSeq/lean's lede.ini"
+        # 新增：新架构参数
+        DEVICE_NAME="HC5661"
+        SYSTEM_NAME="lede"
+        FLASH_SIZE="32M"
         ;;
     2)
         DEVICE_TAG="Lean's LEDE - Newifi3_D2"
@@ -18,9 +22,13 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/[Lean's LEDE]Newifi3D2-part2.sh"
+        DIY_P2_SH="diy-part2/_framework.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/lean's%2520lede")
         SEQ_FILE="testSeq/lean's lede.ini"
+        # 新增：新架构参数
+        DEVICE_NAME="Newifi3D2"
+        SYSTEM_NAME="lede"
+        FLASH_SIZE="32M"
         ;;
     3)
         DEVICE_TAG="Lean's LEDE - RE-SP-01B"
@@ -28,9 +36,13 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/[Lean's LEDE]RE-SP-01B-part2.sh"
+        DIY_P2_SH="diy-part2/_framework.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/lean's%2520lede")
         SEQ_FILE="testSeq/lean's lede.ini"
+        # 新增：新架构参数
+        DEVICE_NAME="RE-SP-01B"
+        SYSTEM_NAME="lede"
+        FLASH_SIZE="32M"
         ;;
     4)
         DEVICE_TAG="OpenWrt - Newifi3_D2"
@@ -38,9 +50,13 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/[OpenWrt]Newifi3D2-part2.sh"
+        DIY_P2_SH="diy-part2/_framework.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/openwrt")
         SEQ_FILE="testSeq/openwrt.ini"
+        # 新增：新架构参数
+        DEVICE_NAME="Newifi3D2"
+        SYSTEM_NAME="openwrt"
+        FLASH_SIZE="32M"
         ;;
     5)
         DEVICE_TAG="OpenWrt - RE-SP-01B"
@@ -48,9 +64,13 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/[OpenWrt]RE-SP-01B-part2.sh"
+        DIY_P2_SH="diy-part2/_framework.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/openwrt")
         SEQ_FILE="testSeq/openwrt.ini"
+        # 新增：新架构参数
+        DEVICE_NAME="RE-SP-01B"
+        SYSTEM_NAME="openwrt"
+        FLASH_SIZE="32M"
         ;;
     6)
         DEVICE_TAG="OpenWrt - RE-CP-02"
@@ -58,9 +78,13 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/[OpenWrt]RE-CP-02-part2.sh"
+        DIY_P2_SH="diy-part2/_framework.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/openwrt")
         SEQ_FILE="testSeq/openwrt.ini"
+        # 新增：新架构参数
+        DEVICE_NAME="RE-CP-02"
+        SYSTEM_NAME="openwrt"
+        FLASH_SIZE="16M"
         ;;
     7)
         # undefined
@@ -87,5 +111,8 @@ DEVICE_ARCH=${DEVICE_ARCH}
 DIY_P2_SH=${DIY_P2_SH}
 DEPENDS=${DEPENDS}
 SEQ_FILE=${SEQ_FILE}
+DEVICE_NAME=${DEVICE_NAME}
+SYSTEM_NAME=${SYSTEM_NAME}
+FLASH_SIZE=${FLASH_SIZE}
 
 EOF
