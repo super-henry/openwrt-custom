@@ -5,7 +5,7 @@
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-# File name: _profile/openwrt-16M.sh
+# File name: config-profiles/openwrt-16M.sh
 # Description: OpenWrt 16M 闪存设备的配置 tier 函数
 #              原位于 Configurator-OpenWrt-16M.sh
 #

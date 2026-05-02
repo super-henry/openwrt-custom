@@ -5,7 +5,7 @@
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-# File name: _lib/_set-defaults.sh
+# File name: _lib/defaults-helper.sh
 # Description: 设备默认配置的共享 helper 函数
 #              原分散在各个设备脚本的 mod_default_config() 中
 #
@@ -35,5 +35,5 @@ _set_theme() {
 _set_custom_defaults() {
     local sh_dir="$1"
     mkdir -p files/etc/uci-defaults
-    cp -v "$sh_dir/[OpenWrt]CustomDefault.sh" files/etc/uci-defaults/99-Custom-Default
+    cp -v "$sh_dir/uci-defaults.sh" files/etc/uci-defaults/99-Custom-Default
 }

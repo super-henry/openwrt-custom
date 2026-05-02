@@ -6,8 +6,8 @@
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-# File name: _framework.sh
-# Description: diy-part2 统一入口脚本
+# File name: diy2arch.sh
+# Description: diy-part2 统一架构入口
 #              根据环境变量组合设备定义、系统修改、配置档，生成 .config
 #
 # 环境变量（由 device-env.sh 或调用方设置）：
@@ -21,7 +21,7 @@ SH_DIR="${SH_DIR:-$(dirname "$0")}"
 CONFIG_TAG="${1:-func}"
 
 cat << EOF
-=======diy-part2 _framework.sh=======
+=======diy-part2 diy2arch.sh=======
     DEVICE : ${DEVICE_NAME}
     SYSTEM : ${SYSTEM_NAME}
     FLASH  : ${FLASH_SIZE}
@@ -32,7 +32,7 @@ EOF
 #=========================================
 # 1. 载入共享 helper
 #=========================================
-. "$SH_DIR/_lib/_set-defaults.sh"
+. "$SH_DIR/_lib/defaults-helper.sh"
 
 #=========================================
 # 2. 载入设备定义 (target_inf, mod_default_config, target_patch)
@@ -47,7 +47,7 @@ fi
 #=========================================
 # 3. 载入系统特定的 modification + add_packages
 #=========================================
-MOD_SCRIPT="$SH_DIR/_lib/_mod-${SYSTEM_NAME}.sh"
+MOD_SCRIPT="$SH_DIR/_lib/sys-${SYSTEM_NAME}.sh"
 if [ ! -f "$MOD_SCRIPT" ]; then
     echo "[ERROR] 系统修改脚本不存在: $MOD_SCRIPT"
     exit 1
@@ -57,7 +57,7 @@ fi
 #=========================================
 # 4. 载入配置档 (config_clean/basic/func/test)
 #=========================================
-PROFILE_SCRIPT="$SH_DIR/_profile/${SYSTEM_NAME}-${FLASH_SIZE}.sh"
+PROFILE_SCRIPT="$SH_DIR/config-profiles/${SYSTEM_NAME}-${FLASH_SIZE}.sh"
 if [ ! -f "$PROFILE_SCRIPT" ]; then
     echo "[ERROR] 配置档不存在: $PROFILE_SCRIPT"
     exit 1

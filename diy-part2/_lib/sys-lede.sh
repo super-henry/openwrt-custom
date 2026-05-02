@@ -5,7 +5,7 @@
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-# File name: _lib/_mod-lede.sh
+# File name: _lib/sys-lede.sh
 # Description: LEDE 通用修改与 feeds 更新逻辑
 #              原位于 Configurator-LEDE-32M.sh
 #

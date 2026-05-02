@@ -8,7 +8,7 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/_framework.sh"
+        DIY_P2_SH="diy-part2/diy2arch.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/lean's%2520lede")
         SEQ_FILE="testSeq/lean's lede.ini"
         # 新增：新架构参数
@@ -22,7 +22,7 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/_framework.sh"
+        DIY_P2_SH="diy-part2/diy2arch.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/lean's%2520lede")
         SEQ_FILE="testSeq/lean's lede.ini"
         # 新增：新架构参数
@@ -36,7 +36,7 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/_framework.sh"
+        DIY_P2_SH="diy-part2/diy2arch.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/lean's%2520lede")
         SEQ_FILE="testSeq/lean's lede.ini"
         # 新增：新架构参数
@@ -50,7 +50,7 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/_framework.sh"
+        DIY_P2_SH="diy-part2/diy2arch.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/openwrt")
         SEQ_FILE="testSeq/openwrt.ini"
         # 新增：新架构参数
@@ -64,7 +64,7 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/_framework.sh"
+        DIY_P2_SH="diy-part2/diy2arch.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/openwrt")
         SEQ_FILE="testSeq/openwrt.ini"
         # 新增：新架构参数
@@ -78,7 +78,7 @@ case $1 in
         REPO_BRANCH=master
 #         COMMIT_SHA=latest
         DEVICE_ARCH="ramips"
-        DIY_P2_SH="diy-part2/_framework.sh"
+        DIY_P2_SH="diy-part2/diy2arch.sh"
         DEPENDS=$(curl -fsSL "https://gist.githubusercontent.com/1-1-2/38e424cd9da729f72fa4a495d23271ea/raw/openwrt")
         SEQ_FILE="testSeq/openwrt.ini"
         # 新增：新架构参数

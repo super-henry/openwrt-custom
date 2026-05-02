@@ -5,7 +5,7 @@
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-# File name: _lib/_mod-openwrt.sh
+# File name: _lib/sys-openwrt.sh
 # Description: OpenWrt 通用修改与外部包拉取逻辑
 #              原分散在 Configurator-OpenWrt-16M.sh 和 Configurator-OpenWrt-32M.sh 中
 #
@@ -81,8 +81,8 @@ modification() {
         [ "$#" -lt 3 ] && echo "[ch_entry_error] 需要至少3个参数：旧入口、新入口和目录路径" && return 1
         [ ! -d "$3" ] && echo "目录不存在：$3" && return 1
         
-        old_entry="$1"
-        new_entry="$2"
+        local old_entry="$1"
+        local new_entry="$2"
         echo -e "\n[MOD] 将 $(echo "$3" | grep -o 'luci-app[^/]*') 从 <$old_entry> 移动到 <$new_entry> [$3]"
         
         find "$3" ! -path "*.svn*" -type f \
@@ -94,7 +94,7 @@ modification() {
     echo 'luci-app-vsftpd 定义了一级菜单 <nas>'
     change_entry services nas feeds/luci/applications/luci-app-aria2
     change_entry services nas feeds/luci/applications/luci-app-hd-idle
-    change_entry services nas feeds/luci/applications/luci-app-ksmbd
+    # change_entry services nas feeds/luci/applications/luci-app-ksmbd  # <nas> menu defined by vsftpd; ksmbd may not be enabled in clean/basic
     change_entry services nas feeds/luci/applications/luci-app-transmission
 
     echo

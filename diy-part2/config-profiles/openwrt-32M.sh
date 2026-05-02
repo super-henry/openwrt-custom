@@ -5,7 +5,7 @@
 # This is free software, licensed under the MIT License.
 # See /LICENSE for more information.
 #
-# File name: _profile/openwrt-32M.sh
+# File name: config-profiles/openwrt-32M.sh
 # Description: OpenWrt 32M 闪存设备的配置 tier 函数
 #              原位于 Configurator-OpenWrt-32M.sh
 #
