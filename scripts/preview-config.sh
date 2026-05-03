@@ -11,8 +11,8 @@
 #
 # 用法：
 #   scripts/preview-config.sh <device_choice> [config_tag]
-#   
-#   device_choice : 1-6，对应 device-env.sh 中的编号
+#
+#   device_choice : 编号，对应 device-env.sh 中的 case 分支
 #   config_tag    : clean | basic | func | test，默认 func
 #
 # 示例：
@@ -25,53 +25,81 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+#=========================================
+# 动态解析 device-env.sh 获取设备列表
+#=========================================
+parse_device_env() {
+    local env_file="$1"
+    local choice="$2"
+
+    # 提取指定 case 分支的内容
+    awk -v n="$choice" '
+        $0 ~ "^\\s*" n "\\)" { found=1; next }
+        found && /^\s*;;/      { exit }
+        found                    { print }
+    ' "$env_file"
+}
+
+# 从 case 分支内容中提取变量值
+extract_var() {
+    local block="$1"
+    local var="$2"
+    echo "$block" | grep "${var}=\"" | head -1 | sed 's/.*="\([^"]*\)".*/\1/'
+}
+
+# 列出所有可用设备
+list_devices() {
+    echo "可用设备列表："
+    echo ""
+    local num=1
+    while true; do
+        local block
+        block=$(parse_device_env "$REPO_ROOT/device-env.sh" "$num" 2>/dev/null)
+        [ -z "$block" ] && break
+        local tag
+        tag=$(extract_var "$block" "DEVICE_TAG")
+        [ -z "$tag" ] && break
+        echo "  $num  - $tag"
+        num=$((num + 1))
+    done
+    echo ""
+    echo "配置档位：clean | basic | func | test"
+}
+
+#=========================================
 # 参数解析
+#=========================================
 DEVICE_CHOICE="${1:-}"
 CONFIG_TAG="${2:-func}"
 
 if [ -z "$DEVICE_CHOICE" ]; then
     echo "用法: $0 <device_choice> [config_tag]"
     echo ""
-    echo "设备列表："
-    echo "  1  - Lean's LEDE - HC5661"
-    echo "  2  - Lean's LEDE - Newifi3_D2"
-    echo "  3  - Lean's LEDE - RE-SP-01B"
-    echo "  4  - OpenWrt - Newifi3_D2"
-    echo "  5  - OpenWrt - RE-SP-01B"
-    echo "  6  - OpenWrt - RE-CP-02"
-    echo ""
-    echo "配置档位：clean | basic | func | test"
+    list_devices
     exit 1
 fi
 
-# 加载 device-env.sh 获取环境变量
-# 在本地运行时没有 $GITHUB_ENV，所以用临时文件中转
+# 验证设备编号有效
+DEVICE_BLOCK=$(parse_device_env "$REPO_ROOT/device-env.sh" "$DEVICE_CHOICE" 2>/dev/null)
+if [ -z "$DEVICE_BLOCK" ]; then
+    echo "[ERROR] 无效的设备编号: $DEVICE_CHOICE"
+    echo ""
+    list_devices
+    exit 1
+fi
+
+# 提取设备参数
+DEVICE_TAG=$(extract_var "$DEVICE_BLOCK" "DEVICE_TAG")
+DEVICE_NAME=$(extract_var "$DEVICE_BLOCK" "DEVICE_NAME")
+SYSTEM_NAME=$(extract_var "$DEVICE_BLOCK" "SYSTEM_NAME")
+FLASH_SIZE=$(extract_var "$DEVICE_BLOCK" "FLASH_SIZE")
+
+if [ -z "$DEVICE_NAME" ] || [ -z "$SYSTEM_NAME" ] || [ -z "$FLASH_SIZE" ]; then
+    echo "[ERROR] device-env.sh 中编号 $DEVICE_CHOICE 缺少 DEVICE_NAME/SYSTEM_NAME/FLASH_SIZE"
+    exit 1
+fi
+
 echo "===== 加载设备环境 (device-env.sh $DEVICE_CHOICE) ====="
-ENV_TMP=$(mktemp)
-$REPO_ROOT/device-env.sh $DEVICE_CHOICE >/dev/null 2>&1 || true
-# device-env.sh 会输出到 GITHUB_ENV，本地没有，直接解析它的赋值语句
-# 改用 source 方式加载（在子 shell 中执行，提取变量）
-(
-    # 模拟 GITHUB_ENV 输出
-    GITHUB_ENV="$ENV_TMP"
-    source "$REPO_ROOT/device-env.sh" "$DEVICE_CHOICE" >/dev/null 2>&1
-)
-# 从 device-env.sh 的输出中提取变量（它用 cat << EOF 输出）
-# 更直接的方式：直接解析 case 语句... 不，太复杂
-# 改用：直接设置已知的映射关系（与 device-env.sh 保持一致）
-
-case "$DEVICE_CHOICE" in
-    1) DEVICE_NAME="HC5661"; SYSTEM_NAME="lede"; FLASH_SIZE="32M"; DEVICE_TAG="Lean's LEDE - HC5661" ;;
-    2) DEVICE_NAME="Newifi3D2"; SYSTEM_NAME="lede"; FLASH_SIZE="32M"; DEVICE_TAG="Lean's LEDE - Newifi3_D2" ;;
-    3) DEVICE_NAME="RE-SP-01B"; SYSTEM_NAME="lede"; FLASH_SIZE="32M"; DEVICE_TAG="Lean's LEDE - RE-SP-01B" ;;
-    4) DEVICE_NAME="Newifi3D2"; SYSTEM_NAME="openwrt"; FLASH_SIZE="32M"; DEVICE_TAG="OpenWrt - Newifi3_D2" ;;
-    5) DEVICE_NAME="RE-SP-01B"; SYSTEM_NAME="openwrt"; FLASH_SIZE="32M"; DEVICE_TAG="OpenWrt - RE-SP-01B" ;;
-    6) DEVICE_NAME="RE-CP-02"; SYSTEM_NAME="openwrt"; FLASH_SIZE="16M"; DEVICE_TAG="OpenWrt - RE-CP-02" ;;
-    *) echo "无效的设备编号: $DEVICE_CHOICE"; rm -f "$ENV_TMP"; exit 1 ;;
-esac
-
-rm -f "$ENV_TMP"
-
 echo "DEVICE_TAG : $DEVICE_TAG"
 echo "DEVICE_NAME: $DEVICE_NAME"
 echo "SYSTEM_NAME: $SYSTEM_NAME"
@@ -90,12 +118,22 @@ SH_DIR="$REPO_ROOT/diy-part2"
 #=========================================
 # 2. 载入设备定义
 #=========================================
-. "$SH_DIR/_device/${DEVICE_NAME}.sh"
+DEVICE_SCRIPT="$SH_DIR/_device/${DEVICE_NAME}.sh"
+if [ ! -f "$DEVICE_SCRIPT" ]; then
+    echo "[ERROR] 设备定义文件不存在: $DEVICE_SCRIPT"
+    exit 1
+fi
+. "$DEVICE_SCRIPT"
 
 #=========================================
 # 3. 载入配置档
 #=========================================
-. "$SH_DIR/_profile/${SYSTEM_NAME}-${FLASH_SIZE}.sh"
+PROFILE_SCRIPT="$SH_DIR/config-profiles/${SYSTEM_NAME}-${FLASH_SIZE}.sh"
+if [ ! -f "$PROFILE_SCRIPT" ]; then
+    echo "[ERROR] 配置档不存在: $PROFILE_SCRIPT"
+    exit 1
+fi
+. "$PROFILE_SCRIPT"
 
 #=========================================
 # 4. 生成 .config 预览（不执行 add_packages/modification/target_patch）
@@ -134,5 +172,5 @@ echo ""
 echo "说明："
 echo "  - 此输出仅包含 target_inf + config tier 的内容"
 echo "  - 实际编译时还会执行 add_packages、modification、target_patch"
-echo "  - 最终 .config 还会经过 sed 's/^[ \\t]*//g' 清理行首空白"
+echo "  - 最终 .config 还会经过 sed 's/^[ \t]*//g' 清理行首空白"
 echo "  - 以及 make defconfig 补全默认值"
