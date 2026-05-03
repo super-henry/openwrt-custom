@@ -129,14 +129,8 @@ CONFIG_PACKAGE_luci-app-nft-qos=m
 CONFIG_PACKAGE_luci-app-sqm=y
 # ----------RPX_n2n
 CONFIG_PACKAGE_luci-app-n2n=y
-# ----------STAT_luci-app-nlbwmon
-CONFIG_PACKAGE_luci-app-nlbwmon=m
 # ----------Utilities_cfdisk
 CONFIG_PACKAGE_cfdisk=y
-# ----------STAT_luci-app-vnstat2
-CONFIG_PACKAGE_luci-app-vnstat2=m
-# ----------Test_NATMap
-CONFIG_PACKAGE_luci-app-natmap=y
 # ----------Test_wangyu_UDPspeeder
 CONFIG_PACKAGE_UDPspeeder=y
 CONFIG_PACKAGE_luci-app-speederv2=y
@@ -156,6 +150,10 @@ config_test() {
     # 测试域
     #=========================================
     cat << EOF
+# ----------STAT_luci-app-nlbwmon
+CONFIG_PACKAGE_luci-app-nlbwmon=m
+# ----------STAT_luci-app-vnstat2
+CONFIG_PACKAGE_luci-app-vnstat2=m
 # ----------RPX_nps
 CONFIG_PACKAGE_luci-app-npc=m
 CONFIG_PACKAGE_luci-app-nps=m

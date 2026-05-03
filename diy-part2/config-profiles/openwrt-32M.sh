@@ -129,25 +129,8 @@ CONFIG_PACKAGE_luci-app-nft-qos=m
 CONFIG_PACKAGE_luci-app-sqm=y
 # ----------RPX_n2n
 CONFIG_PACKAGE_luci-app-n2n=y
-# ----------RPX_nps
-CONFIG_PACKAGE_luci-app-npc=m
-CONFIG_PACKAGE_luci-app-nps=m
-CONFIG_PACKAGE_npc=m
-# ----------STAT_luci-app-nlbwmon
-CONFIG_PACKAGE_luci-app-nlbwmon=m
-# ----------Test_ddns-go
-CONFIG_PACKAGE_luci-app-ddns-go=m
-# ----------Test_lucky
-CONFIG_PACKAGE_luci-app-lucky=m
 # ----------Utilities_cfdisk
 CONFIG_PACKAGE_cfdisk=y
-# ----------rmAD_luci-app-adguardhome
-CONFIG_PACKAGE_luci-app-adguardhome=m
-# CONFIG_PACKAGE_luci-app-adguardhome_INCLUDE_binary is not set
-# ----------STAT_luci-app-vnstat2
-CONFIG_PACKAGE_luci-app-vnstat2=m
-# ----------Test_NATMap
-CONFIG_PACKAGE_luci-app-natmap=y
 # ----------Test_wangyu_UDPspeeder
 CONFIG_PACKAGE_UDPspeeder=y
 CONFIG_PACKAGE_luci-app-speederv2=y
@@ -167,6 +150,21 @@ config_test() {
     # 测试域
     #=========================================
     cat << EOF
+# ----------STAT_luci-app-nlbwmon
+CONFIG_PACKAGE_luci-app-nlbwmon=m
+# ----------STAT_luci-app-vnstat2
+CONFIG_PACKAGE_luci-app-vnstat2=m
+# ----------RPX_nps
+CONFIG_PACKAGE_luci-app-npc=m
+CONFIG_PACKAGE_luci-app-nps=m
+CONFIG_PACKAGE_npc=m
+# ----------Test_ddns-go
+CONFIG_PACKAGE_luci-app-ddns-go=m
+# ----------Test_lucky
+CONFIG_PACKAGE_luci-app-lucky=m
+# ----------rmAD_luci-app-adguardhome
+CONFIG_PACKAGE_luci-app-adguardhome=m
+# CONFIG_PACKAGE_luci-app-adguardhome_INCLUDE_binary is not set
 # ----------Func_luci-app-tinyproxy
 CONFIG_PACKAGE_luci-app-tinyproxy=y
 # ----------Func_luci-app-wechatpush
