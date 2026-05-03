@@ -14,11 +14,14 @@ modification() {
     # 一些可能必要的修改
     echo '[MOD] 把家目录也添加到备份路径'
     echo '/root' > package/base-files/files/lib/upgrade/keep.d/home
+    cat package/base-files/files/lib/upgrade/keep.d/home
     echo
+
     echo '[FIX] 开机创建 /dev/fd --> /proc/self/fd'
     sed -i '\#exit#iln -nsf /proc/self/fd /dev/fd' package/base-files/files/etc/rc.local
     cat package/base-files/files/etc/rc.local
     echo
+    
     echo '[FIX] 创建硬链接，解决无法正确识别出简体中文语言包的问题'
     # ref: https://github.com/ysc3839/luci-proto-minieap/pull/2
     find -type d -path '*/po/zh-cn' | xargs dirname | xargs -I'{}' ln -srvn {}/zh-cn {}/zh_Hans
@@ -141,12 +144,12 @@ add_packages() {
     echo '## From coolsnowwolf'
     echo '== 从酷雪狼(lean)那里借个自动外存挂载 automount, luci-app-unblockmusic'
     # https://github.com/coolsnowwolf/lede/tree/master/package/lean/automount
-    wget --content-disposition https://codeload.github.com/coolsnowwolf/lede/zip/refs/heads/master
+    wget --content-disposition --no-verbose https://codeload.github.com/coolsnowwolf/lede/zip/refs/heads/master
     unzip lede-master.zip lede-master/package/lean/automount/*
     mv -v lede-master/package/lean ./
     rm -rf lede-master lede-master.zip
     # https://github.com/coolsnowwolf/luci/tree/master/applications/luci-app-unblockmusic
-    wget --content-disposition https://codeload.github.com/coolsnowwolf/luci/zip/refs/heads/master
+    wget --content-disposition --no-verbose https://codeload.github.com/coolsnowwolf/luci/zip/refs/heads/master
     unzip luci-master.zip luci-master/applications/luci-app-unblockmusic/*
     mv -v luci-master/applications/luci-app-unblockmusic ./lean/
     rm -rf luci-master luci-master.zip
@@ -156,13 +159,13 @@ add_packages() {
     echo '## From immortalwrt'
     echo '== 从天灵那里借个 luci-app-n2n, luci-app-nps, luci-app-vsftpd, luci-app-speederv2'
     # https://github.com/immortalwrt/luci/blob/master/applications/*
-    wget --content-disposition https://codeload.github.com/immortalwrt/luci/zip/refs/heads/master
+    wget --content-disposition --no-verbose https://codeload.github.com/immortalwrt/luci/zip/refs/heads/master
     unzip luci-master.zip luci-master/applications/luci-app-n2n/* luci-master/applications/luci-app-nps/* luci-master/applications/luci-app-vsftpd/* luci-master/applications/luci-app-speederv2/*
     mv -v luci-master/applications ./immortalwrt
     rm -rf luci-master luci-master.zip
     echo '== 还有依赖 n2n，以及 Yu Wang 的 tinyfecvpn、udp2raw'
     # https://github.com/immortalwrt/packages/blob/master/*
-    wget --content-disposition https://codeload.github.com/immortalwrt/packages/zip/refs/heads/master
+    wget --content-disposition --no-verbose https://codeload.github.com/immortalwrt/packages/zip/refs/heads/master
     unzip packages-master.zip packages-master/net/n2n/* packages-master/net/tinyfecvpn/* packages-master/net/udp2raw/*
     mv -v packages-master/net ./immortalwrt/net
     rm -rf packages-master packages-master.zip
