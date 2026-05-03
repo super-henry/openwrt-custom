@@ -1,0 +1,80 @@
+--- openwrt/target/linux/ramips/dts/mt7621_jdcloud_re-cp-02.dts	2025-04-12 19:08:13.899565717 +0800
++++ openwrt_patch/mt7621_jdcloud_re-cp-02.dts	2025-04-12 12:49:49.538882600 +0800
+@@ -76,22 +76,13 @@
+ 
+ 			partition@0 {
+ 				label = "U-Boot";
+-				reg = <0x0 0x40000>;
++				reg = <0x0 0x20000>;
+ 				read-only;
+ 			};
+ 
+-			partition@40000 {
+-				label = "Config";
+-				reg = <0x40000 0x10000>;
+-
+-				nvmem-layout {
+-					compatible = "u-boot,env";
+-				};
+-			};
+-
+-			partition@50000 {
++			partition@20000 {
+ 				label = "Factory";
+-				reg = <0x50000 0x40000>;
++				reg = <0x20000 0x10000>;
+ 				read-only;
+ 
+ 				nvmem-layout {
+@@ -103,20 +94,20 @@
+ 						reg = <0x0 0xe00>;
+ 					};
+ 
+-					macaddr_factory_3fff4: macaddr@3fff4 {
+-						reg = <0x3fff4 0x6>;
++					macaddr_factory_0: macaddr@80f4 {
++						reg = <0x80f4 0x6>;
+ 					};
+ 
+-					macaddr_factory_3fffa: macaddr@3fffa {
+-						reg = <0x3fffa 0x6>;
++					macaddr_factory_1: macaddr@80fa {
++						reg = <0x80fa 0x6>;
+ 					};
+ 				};
+ 			};
+ 
+-			partition@90000 {
++			partition@30000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x90000 0xf70000>;
++				reg = <0x30000 0xfd0000>;
+ 			};
+ 		};
+ 	};
+@@ -148,7 +139,7 @@
+ };
+ 
+ &gmac0 {
+-	nvmem-cells = <&macaddr_factory_3fff4>;
++	nvmem-cells = <&macaddr_factory_0>;
+ 	nvmem-cell-names = "mac-address";
+ };
+ 
+@@ -157,7 +148,7 @@
+ 	label = "wan";
+ 	phy-handle = <&ethphy4>;
+ 
+-	nvmem-cells = <&macaddr_factory_3fffa>;
++	nvmem-cells = <&macaddr_factory_1>;
+ 	nvmem-cell-names = "mac-address";
+ };
+ 
+@@ -186,4 +177,4 @@
+ 
+ &xhci {
+ 	status = "disabled";
+-};
++};
+\ No newline at end of file

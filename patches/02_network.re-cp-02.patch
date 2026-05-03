@@ -1,0 +1,22 @@
+--- ./openwrt/target/linux/ramips/mt7621/base-files/etc/board.d/02_network	2023-12-15 22:05:46.668367604 +0800
++++ ./patch_test/02_network	2023-12-31 16:57:11.667111818 +0800
+@@ -23,6 +23,7 @@
+ 	xiaomi,mi-router-3-pro|\
+ 	xiaomi,mi-router-ac2100|\
+ 	xiaomi,mi-router-cr6606|\
++	jdcloud,re-cp-02|\
+ 	xiaomi,mi-router-cr6608|\
+ 	xiaomi,mi-router-cr6609|\
+ 	xiaomi,redmi-router-ac2100|\
+@@ -188,6 +189,11 @@
+ 	zbtlink,zbt-wg3526-32m)
+ 		label_mac=$(mtd_get_mac_binary factory 0x4)
+ 		;;
++	jdcloud,re-cp-02)
++		wan_mac=$(mtd_get_mac_binary factory 0x80f4)
++		lan_mac=$(mtd_get_mac_binary factory 0x80fa)
++		label_mac=$lan_mac
++		;;
+ 	ampedwireless,ally-00x19k)
+ 		lan_mac=$(mtd_get_mac_ascii hwconfig HW.LAN.MAC.Address)
+ 		label_mac=$lan_mac

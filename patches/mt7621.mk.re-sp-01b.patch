@@ -1,0 +1,11 @@
+--- openwrt/target/linux/ramips/image/mt7621.mk	2026-05-01 20:34:28.984733199 +0800
++++ patch_test/mt7621.mk	2026-05-03 12:33:35.852934924 +0800
+@@ -2004,7 +2004,7 @@
+ 
+ define Device/jdcloud_re-sp-01b
+   $(Device/dsa-migration)
+-  IMAGE_SIZE := 27328k
++  IMAGE_SIZE := 32448k
+   DEVICE_VENDOR := JDCloud
+   DEVICE_MODEL := RE-SP-01B
+   DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615-firmware \

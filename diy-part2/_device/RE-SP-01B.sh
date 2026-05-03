@@ -49,22 +49,17 @@ mod_default_config() {
 # 原分散在 [LEDE]RE-SP-01B-part2.sh 和 [OpenWrt]RE-SP-01B-part2.sh 中
 #=========================================
 target_patch() {
-    local gist_base='https://gist.githubusercontent.com/1-1-2/335dbc8e138f39fb8fe6243d424fe476/raw'
+    local PATCH_DIR="$GITHUB_WORKSPACE/patches"
 
-    # load dts
-    echo '[+TARGET] 载入 mt7621_jdcloud_re-sp-01b.dts'
-    curl --retry 3 -s --globoff "${gist_base}/mt7621_jdcloud_re-sp-01b.dts" -o target/linux/ramips/dts/mt7621_jdcloud_re-sp-01b.dts
-    ls -l target/linux/ramips/dts/mt7621_jdcloud_re-sp-01b.dts
+    # dts补丁，去除mini/oem分区
+    echo '[+TARGET] 应用 mt7621_jdcloud_re-sp-01b.dts.patch'
+    patch target/linux/ramips/dts/mt7621_jdcloud_re-sp-01b.dts "${PATCH_DIR}/mt7621_jdcloud_re-sp-01b.dts.patch"
 
-    # fix2 + fix4.2
+    # IMAGE_SIZE(27328k->32448k)
     echo '[+TARGET] 应用 mt7621.mk.re-sp-01b.patch'
-    curl --retry 3 -s "${gist_base}/mt7621.mk.re-sp-01b.patch" | patch target/linux/ramips/image/mt7621.mk
+    patch target/linux/ramips/image/mt7621.mk "${PATCH_DIR}/mt7621.mk.re-sp-01b.patch"
     
-    # fix3 + fix5.2
+    # network中增加MAC地址计算逻辑
     echo '[+TARGET] 应用 02_network.re-sp-01b.patch'
-    curl --retry 3 -s "${gist_base}/02_network.re-sp-01b.patch" | patch target/linux/ramips/mt7621/base-files/etc/board.d/02_network
-    
-    # fix5.1
-    echo '[+TARGET] 应用 system.sh.re-sp-01b.patch'
-    curl --retry 3 -s "${gist_base}/system.sh.re-sp-01b.patch" | patch package/base-files/files/lib/functions/system.sh
+    patch target/linux/ramips/mt7621/base-files/etc/board.d/02_network "${PATCH_DIR}/02_network.re-sp-01b.patch"
 }

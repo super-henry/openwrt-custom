@@ -1,0 +1,23 @@
+--- openwrt/target/linux/ramips/dts/mt7621_jdcloud_re-sp-01b.dts	2026-05-01 20:34:28.968733199 +0800
++++ ./openwrt_patch/mt7621_jdcloud_re-sp-01b.dts	2026-05-03 12:05:45.244934858 +0800
+@@ -106,19 +106,7 @@
+ 			partition@50000 {
+ 				compatible = "denx,uimage";
+ 				label = "firmware";
+-				reg = <0x50000 0x1ab0000>;
+-			};
+-
+-			partition@1b00000 {
+-				label = "mini";
+-				reg = <0x1b00000 0x400000>;
+-				read-only;
+-			};
+-
+-			partition@1f00000 {
+-				label = "oem";
+-				reg = <0x1f00000 0x100000>;
+-				read-only;
++				reg = <0x50000 0x1fb0000>;
+ 			};
+ 		};
+ 	};

@@ -1,0 +1,11 @@
+--- openwrt/target/linux/ramips/mt7621/base-files/etc/board.d/02_network	2026-05-01 20:34:28.988733199 +0800
++++ patch_test/02_network	2026-05-03 12:39:47.048935261 +0800
+@@ -272,7 +272,7 @@
+ 		;;
+ 	jdcloud,re-sp-01b)
+ 		lan_mac=$(mtd_get_mac_ascii config mac)
+-		wan_mac=$lan_mac
++		wan_mac=$(macaddr_add "$lan_mac" 1)
+ 		label_mac=$lan_mac
+ 		;;
+ 	belkin,rt1800|\

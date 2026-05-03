@@ -1,0 +1,63 @@
+--- n2n.init.sh
++++ n2n.init_mod.sh
+@@ -1,6 +1,9 @@
+ #!/bin/sh /etc/rc.common
+ # Copyright (C) 2008-2020 OpenWrt.org
+ # Copyright (C) 2022 ImmortalWrt.org
++# 20230106 mod by 1-1-2
++# 在有nftables的设备上好像不需要添加防火墙规则。。。
++# 所以都注释掉了
+ 
+ START=99
+ USE_PROCD=1
+@@ -57,9 +60,13 @@
+ 		procd_set_param respawn
+ 		procd_close_instance
+ 
+-		iptables -I FORWARD -i "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth'
+-		iptables -I FORWARD -o "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth'
+-		[ "$masquerade" = "0" ] || iptables -t nat -I POSTROUTING -o "$tunname" -j MASQUERADE -m comment --comment 'n2n edge net'
++		# iptables -I FORWARD -i "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth'
++		# nft add rule inet fw4 forward iifname "$tunname" accept comment 'n2n edge eth'
++		# iptables -I FORWARD -o "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth'
++		# nft add rule inet fw4 forward oifname "$tunname" accept comment 'n2n edge eth'
++
++		# [ "$masquerade" = "0" ] || iptables -t nat -I POSTROUTING -o "$tunname" -j MASQUERADE -m comment --comment 'n2n edge net'
++		# [ "$masquerade" = "0" ] || nft add rule inet fw4 srcnat oif "$tunname" masquerade
+ 	;;
+ 	supernode)
+ 		local enabled
+@@ -82,7 +89,8 @@
+ 		procd_set_param respawn
+ 		procd_close_instance
+ 
+-		iptables -I INPUT -p udp --dport $port -j ACCEPT -m comment --comment 'n2n supernode port'
++		# iptables -I INPUT -p udp --dport $port -j ACCEPT -m comment --comment 'n2n supernode port'
++		# nft add rule inet fw4 input udp dport "$port" accept comment 'n2n supernode port'
+ 	;;
+ 	route)
+ 		local enabled
+@@ -110,15 +118,19 @@
+ 		config_get tunname "$cfg" 'tunname'
+ 		config_get_bool masquerade "$cfg" 'masquerade' '0'
+ 
+-		iptables -D FORWARD -i "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth' 2>/dev/null
+-		iptables -D FORWARD -o "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth' 2>/dev/null
+-		iptables -t nat -D POSTROUTING -o "$tunname" -j MASQUERADE -m comment --comment 'n2n edge net' 2>"/dev/null"
++		# iptables -D FORWARD -i "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth' 2>/dev/null
++		# nft delete rule inet fw4 forward iif "$tunname" accept comment 'n2n edge eth'
++		# iptables -D FORWARD -o "$tunname" -j ACCEPT -m comment --comment 'n2n edge eth' 2>/dev/null
++		# nft delete rule inet fw4 forward oif "$tunname" accept comment 'n2n edge eth'
++		# iptables -t nat -D POSTROUTING -o "$tunname" -j MASQUERADE -m comment --comment 'n2n edge net' 2>"/dev/null"
++		# nft delete rule inet fw4 srcnat oif "$tunname" masquerade comment 'n2n edge net'
+ 	;;
+ 	supernode)
+ 		local port
+ 		config_get port "$cfg" 'port'
+ 
+-		iptables -D INPUT -p udp --dport "$port" -j ACCEPT -m comment --comment 'n2n supernode port' 2>"/dev/null"
++		# iptables -D INPUT -p udp --dport "$port" -j ACCEPT -m comment --comment 'n2n supernode port' 2>"/dev/null"
++		# nft delete rule inet fw4 input udp dport "$port" accept comment 'n2n supernode port'
+ 	;;
+ 	esac
+ }

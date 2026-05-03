@@ -37,17 +37,17 @@ mod_default_config() {
 # 原位于 [OpenWrt]RE-CP-02-part2.sh
 #=========================================
 target_patch() {
-    local gist_base='https://gist.githubusercontent.com/1-1-2/335dbc8e138f39fb8fe6243d424fe476/raw'
+    local PATCH_DIR="$GITHUB_WORKSPACE/patches"
 
-    # load dts
-    echo '[+TARGET] 应用 mt7621_jdcloud_re-cp-02.dts.target_patch'
-    curl --retry 3 -s "${gist_base}/mt7621_jdcloud_re-cp-02.dts.patch" | patch target/linux/ramips/dts/mt7621_jdcloud_re-cp-02.dts
+    # dts补丁，使用自定义分区，更新数据偏移位置
+    echo '[+TARGET] 应用 mt7621_jdcloud_re-cp-02.dts.patch'
+    patch target/linux/ramips/dts/mt7621_jdcloud_re-cp-02.dts "${PATCH_DIR}/mt7621_jdcloud_re-cp-02.dts.patch"
 
-    # fix2 + fix4.2
+    # IMAGE_SIZE(16000K->16192K)
     echo '[+TARGET] 应用 mt7621.mk.re-cp-02.patch'
-    curl --retry 3 -s "${gist_base}/mt7621.mk.re-cp-02.patch" | patch target/linux/ramips/image/mt7621.mk
-    
-    # fix3 + fix5.2
+    patch target/linux/ramips/image/mt7621.mk "${PATCH_DIR}/mt7621.mk.re-cp-02.patch"
+
+    # network中增加MAC地址读取逻辑
     echo '[+TARGET] 应用 02_network.re-cp-02.patch'
-    curl --retry 3 -s "${gist_base}/02_network.re-cp-02.patch" | patch target/linux/ramips/mt7621/base-files/etc/board.d/02_network
+    patch target/linux/ramips/mt7621/base-files/etc/board.d/02_network "${PATCH_DIR}/02_network.re-cp-02.patch"
 }

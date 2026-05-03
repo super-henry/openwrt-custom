@@ -167,7 +167,7 @@ add_packages() {
     mv -v packages-master/net ./immortalwrt/net
     rm -rf packages-master packages-master.zip
     echo '[MOD] 在有nftables的设备上好像不需要添加防火墙规则，应用 n2n.init.patch'
-    curl --retry 3 -s "https://gist.githubusercontent.com/1-1-2/335dbc8e138f39fb8fe6243d424fe476/raw/n2n.init.patch" | patch immortalwrt/net/n2n/files/n2n.init
+    patch immortalwrt/net/n2n/files/n2n.init "${GITHUB_WORKSPACE}/patches/n2n.init.patch"
     # echo '从 Hyy2001X 那里借一个改好的 luci-app-npc(kenzo中已间接引用)'
     # echo '还有依赖 nps(kenzo中已引用coolsnowwolf源)'
     echo
