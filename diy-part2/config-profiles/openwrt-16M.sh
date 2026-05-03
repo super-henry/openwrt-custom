@@ -133,7 +133,6 @@ CONFIG_PACKAGE_luci-app-n2n=y
 CONFIG_PACKAGE_cfdisk=y
 # ----------Test_wangyu_UDPspeeder
 CONFIG_PACKAGE_UDPspeeder=y
-CONFIG_PACKAGE_luci-app-speederv2=y
 # ----------Test_wangyu_tinyfecVPN
 CONFIG_PACKAGE_luci-app-tinyfecvpn=y
 CONFIG_PACKAGE_tinyfecvpn=y

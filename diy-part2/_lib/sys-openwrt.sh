@@ -105,7 +105,6 @@ modification() {
     change_entry services vpn feeds/kenzo/luci-app-npc
     change_entry services vpn feeds/kenzo/luci-app-udp2raw
     change_entry services vpn package/immortalwrt/luci-app-nps
-    change_entry services vpn package/immortalwrt/luci-app-speederv2
     change_entry services vpn package/luci-app-tinyfecvpn
     # change_entry services vpn package/luci-app-kcptun
 
@@ -157,10 +156,10 @@ add_packages() {
     echo
 
     echo '## From immortalwrt'
-    echo '== 从天灵那里借个 luci-app-n2n, luci-app-nps, luci-app-vsftpd, luci-app-speederv2'
+    echo '== 从天灵那里借个 luci-app-n2n, luci-app-nps, luci-app-vsftpd'
     # https://github.com/immortalwrt/luci/blob/master/applications/*
     wget --content-disposition --no-verbose https://codeload.github.com/immortalwrt/luci/zip/refs/heads/master
-    unzip luci-master.zip luci-master/applications/luci-app-n2n/* luci-master/applications/luci-app-nps/* luci-master/applications/luci-app-vsftpd/* luci-master/applications/luci-app-speederv2/*
+    unzip luci-master.zip luci-master/applications/luci-app-n2n/* luci-master/applications/luci-app-nps/* luci-master/applications/luci-app-vsftpd/*
     mv -v luci-master/applications ./immortalwrt
     rm -rf luci-master luci-master.zip
     echo '== 还有依赖 n2n，以及 Yu Wang 的 tinyfecvpn、udp2raw'
