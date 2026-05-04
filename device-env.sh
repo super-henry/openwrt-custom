@@ -1,7 +1,10 @@
 #!/bin/bash
 
 echo "Hi, I'm $0."
-case $1 in
+# 提取整数部分：删除第一个小数点及其后面的所有字符
+int_part="${1%%.*}"
+
+case $int_part in
     1)
         DEVICE_TAG="Lean's LEDE - HC5661"
         REPO_USE=coolsnowwolf/lede
