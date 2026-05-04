@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# 生成设备配置对比 HTML 页面（暖阳白调 + 纸质纹理 + Dock标签栏 + 下拉适配）
+# 生成设备配置对比 HTML 页面（暖阳白调 + 纸质纹理 + Dock标签栏弹性动画）
 # 由 preview-config.sh --html 调用
 #
 set -e
@@ -205,6 +205,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
     position: relative;
     z-index: 2;
 }
@@ -221,10 +222,11 @@ body {
     z-index: 10;
     background: transparent;
     overflow: visible;
+    overflow: hidden;
 }
 
 .tab-btn {
-    padding: 8px 18px;
+    padding: 8px 5px;
     border: 1px solid #e0d7c6;
     border-radius: 8px 8px 0 0;
     background: #fffbf5;
@@ -233,8 +235,14 @@ body {
     color: #5c4a3a;
     margin: 0 3px;
     border-bottom: none;
-    transition: 0.2s;
+    transition: flex-basis 0.3s ease, padding 0.3s;
     white-space: nowrap;
+    flex: 0 1 auto;
+    will-change: flex-basis;
+    min-width: 44px;
+    text-align: center;           /* 文字水平居中 */
+    overflow: hidden;             /* 隐藏溢出 */
+    text-overflow: hidden;
 }
 
 .tab-btn:hover { background: #fef3e4; }
@@ -246,25 +254,9 @@ body {
     font-weight: 600;
 }
 
+/* dock模式不再用transform，完全由js控制宽度 */
 .dock-mode .tab-btn {
-    font-size: 0.8rem;
-    padding: 5px 10px;
-    max-width: 80px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transform: scale(0.9);
-    opacity: 0.7;
-}
-
-.dock-mode .tab-btn:hover,
-.dock-mode .tab-btn.active {
-    transform: scale(1);
-    opacity: 1;
-    max-width: none;
-    overflow: visible;
-    font-size: 0.95rem;
-    padding: 8px 18px;
-    z-index: 20;
+    /* 保留占位，不设置额外样式 */
 }
 
 .mobile-select {
@@ -288,11 +280,12 @@ body {
     min-height: 0;
 }
 
-/* 卡片容器 - 修复滚动条的关键 */
+/* 卡片容器 */
 .card-container {
     height: 100%;
     display: flex;
     flex-direction: column;
+    min-height: 0;
 }
 
 .device-card { display: none; width: fit-content; margin: 0; }
@@ -300,6 +293,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
 }
 .card-inner {
     background: #fffdf9;
@@ -309,6 +303,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0;
 }
 .card-header {
     background: #d97706;
@@ -337,6 +332,7 @@ body {
     padding: 0;
     scrollbar-width: thin;
     scrollbar-color: #d9d0c1 transparent;
+    min-height: 0;
 }
 .card-body::-webkit-scrollbar { width: 5px; height: 5px; }
 .card-body::-webkit-scrollbar-track { background: transparent; }
@@ -443,6 +439,7 @@ HTMLEOF
     let colChecks = {};
     CONFIG_TAGS.forEach(t => colChecks[t] = true);
 
+    // ---------- 工具函数 ----------
     function getEmoji(val) {
         if (val === 'y') return '✅';
         if (val === 'm') return '📦';
@@ -451,6 +448,7 @@ HTMLEOF
     }
     function escapeId(str) { return CSS.escape(str); }
 
+    // ---------- UI 构建 ----------
     function buildAll() {
         if (DEVICE_ORDER.length === 0) {
             cardContainer.innerHTML = '<p style="text-align:center;padding:20px;">没有设备数据。</p>';
@@ -487,8 +485,8 @@ HTMLEOF
         });
         applyView();
         refreshAllInteractions();
+        syncTabBarWidth();
         checkDockMode();
-        setTimeout(syncTabBarWidth, 0);
     }
 
     function buildDeviceCard(dev) {
@@ -571,6 +569,7 @@ HTMLEOF
         });
     }
 
+    // ---------- 表格/卡片交互 ----------
     function refreshCard(card) {
         if (currentView === 'table') refreshTable(card);
         else refreshCards(card);
@@ -662,30 +661,132 @@ HTMLEOF
         syncTabBarWidth();
     }
 
-    function checkDockMode() {
-        if (window.innerWidth <= 768) return;
-        const totalWidth = Array.from(tabBar.children)
-            .reduce((sum, btn) => sum + btn.offsetWidth + parseInt(getComputedStyle(btn).marginLeft) + parseInt(getComputedStyle(btn).marginRight), 0);
-        tabBar.classList.toggle('dock-mode', totalWidth > tabBar.clientWidth);
-    }
+    // ---------- Dock 模式与弹性动画 ----------
+    let dockEnabled = false;
+    let savedBasis = new Map();  // 记录每个标签的原始flex-basis
 
-    function syncTabBarWidth() {
-        if (window.innerWidth <= 768) return;
-        const activeCard = document.querySelector('.device-card.active');
-        if (activeCard) {
-            tabBar.style.width = activeCard.offsetWidth + 'px';
+    function checkDockMode() {
+        if (window.innerWidth <= 768) {
+            tabBar.classList.remove('dock-mode');
+            dockEnabled = false;
+            resetAllTabs();
+            return;
+        }
+
+        syncTabBarWidth();   // 先让标签栏宽度等于激活卡片宽度
+
+        const totalWidth = Array.from(tabBar.children).reduce((sum, btn) => sum + btn.scrollWidth, 0);
+        const containerWidth = tabBar.clientWidth;
+
+        if (totalWidth > containerWidth && !dockEnabled) {
+            // 首次溢出：保存每个标签的原始宽度
+            Array.from(tabBar.children).forEach(btn => {
+                if (!savedBasis.has(btn)) {
+                    savedBasis.set(btn, btn.getBoundingClientRect().width);
+                }
+            });
+            tabBar.classList.add('dock-mode');
+            dockEnabled = true;
+        } else if (totalWidth <= containerWidth && dockEnabled) {
+            resetAllTabs();
+            tabBar.classList.remove('dock-mode');
+            dockEnabled = false;
         }
     }
 
+    function resetAllTabs() {
+        Array.from(tabBar.children).forEach(btn => {
+            btn.style.flexBasis = '';
+            btn.style.transition = '';
+            savedBasis.delete(btn);
+        });
+    }
+
+    // 弹性动画核心：分配放大增量到相邻标签
+    function applyHoverEffect(targetBtn) {
+        if (!dockEnabled) return;
+        const buttons = Array.from(tabBar.children);
+        const idx = buttons.indexOf(targetBtn);
+        if (idx === -1) return;
+
+        // 临时解除溢出隐藏并设为 auto 宽度，测量真实文本宽度
+        const prevOverflow = targetBtn.style.overflow;
+        const prevFlexBasis = targetBtn.style.flexBasis;
+        targetBtn.style.overflow = 'visible';
+        targetBtn.style.flexBasis = 'auto';
+        const idealWidth = targetBtn.scrollWidth + 8;   // 真实文本占宽
+        targetBtn.style.overflow = prevOverflow || '';
+        targetBtn.style.flexBasis = prevFlexBasis || '';
+
+        const origWidth = savedBasis.get(targetBtn) || targetBtn.getBoundingClientRect().width;
+        if (idealWidth <= origWidth) {
+            // 无需放大，恢复其他压缩
+            clearHoverEffect();
+            return;
+        }
+
+        const delta = idealWidth - origWidth;
+
+        // 收集相邻待压缩标签（左右各2个）
+        const compressCandidates = [];
+        for (let dist = 1; dist <= 2; dist++) {
+            const left = buttons[idx - dist];
+            const right = buttons[idx + dist];
+            if (left) compressCandidates.push({ btn: left, dist });
+            if (right) compressCandidates.push({ btn: right, dist });
+        }
+        if (compressCandidates.length === 0) return;
+
+        // 权重：距离1权重2，距离2权重1
+        const weightSum = compressCandidates.reduce((s, c) => s + (c.dist === 1 ? 2 : 1), 0);
+        const unit = delta / weightSum;
+
+        // 分配宽度
+        buttons.forEach((btn, i) => {
+            if (i === idx) {
+                btn.style.flexBasis = idealWidth + 'px';
+            } else {
+                const candidate = compressCandidates.find(c => c.btn === btn);
+                if (candidate) {
+                    const shrink = unit * (candidate.dist === 1 ? 2 : 1);
+                    const orig = savedBasis.get(btn) || btn.getBoundingClientRect().width;
+                    const newWidth = Math.max(44, orig - shrink);
+                    btn.style.flexBasis = newWidth + 'px';
+                } else {
+                    // 未参与压缩的恢复原始宽度
+                    if (savedBasis.has(btn)) {
+                        btn.style.flexBasis = savedBasis.get(btn) + 'px';
+                    }
+                }
+            }
+            if (!btn.style.transition) {
+                btn.style.transition = 'flex-basis 0.3s ease';
+            }
+        });
+    }
+
+    function clearHoverEffect() {
+        if (!dockEnabled) return;
+        const buttons = Array.from(tabBar.children);
+        buttons.forEach(btn => {
+            if (savedBasis.has(btn)) {
+                btn.style.flexBasis = savedBasis.get(btn) + 'px';
+            }
+        });
+    }
+
+    // ---------- 事件绑定 ----------
     function bindEvents() {
         mobileSelect.addEventListener('change', e => switchDevice(e.target.value));
 
+        // 标签栏点击切换设备
         tabBar.addEventListener('click', e => {
             const btn = e.target.closest('.tab-btn');
             if (!btn) return;
             switchDevice(btn.dataset.deviceId);
         });
 
+        // 卡片内各种交互（原有功能全部保留）
         cardContainer.addEventListener('click', e => {
             const card = e.target.closest('.device-card');
             if (!card) return;
@@ -699,6 +800,7 @@ HTMLEOF
                 document.querySelectorAll(`.col-cb[data-tag="${tag}"]`).forEach(cb => cb.checked = e.target.checked);
                 refreshAllInteractions();
             }
+            // 分组折叠
             if (e.target.closest('.group-header')) {
                 const header = e.target.closest('.group-header');
                 const group = header.dataset.group;
@@ -716,14 +818,11 @@ HTMLEOF
                 items.forEach(it => it.style.display = hidden ? '' : 'none');
                 header.classList.toggle('collapsed', !hidden);
             }
+            // 全部折叠/展开
+            if (e.target.classList.contains('collapse-all-btn')) setAllGroups(card, true);
+            if (e.target.classList.contains('expand-all-btn')) setAllGroups(card, false);
 
-            if (e.target.classList.contains('collapse-all-btn')) {
-                setAllGroups(card, true);
-            }
-            if (e.target.classList.contains('expand-all-btn')) {
-                setAllGroups(card, false);
-            }
-
+            // 视图/字体/图例
             if (e.target.classList.contains('toggle-view-btn')) {
                 currentView = currentView === 'table' ? 'cards' : 'table';
                 applyView();
@@ -745,6 +844,7 @@ HTMLEOF
             }
         });
 
+        // 鼠标悬浮表格行效果
         cardContainer.addEventListener('mouseover', e => {
             const row = e.target.closest('.data-row');
             if (row && currentView === 'table') row.classList.add('hover-row');
@@ -754,30 +854,40 @@ HTMLEOF
             if (row && currentView === 'table') row.classList.remove('hover-row');
         });
 
+        // ========== Dock 弹性动画事件 ==========
+        tabBar.addEventListener('mouseover', e => {
+            if (!dockEnabled) return;
+            const btn = e.target.closest('.tab-btn');
+            if (!btn) return;
+            applyHoverEffect(btn);
+        });
+        tabBar.addEventListener('mouseout', e => {
+            if (!dockEnabled) return;
+            // 判断是否移出整个标签栏
+            if (!e.relatedTarget || !tabBar.contains(e.relatedTarget)) {
+                clearHoverEffect();
+            }
+        });
+
+        // 窗口大小改变时重新评估 dock 模式，并重置动画
         window.addEventListener('resize', () => {
             checkDockMode();
             syncTabBarWidth();
+            // 尺寸变化后可能不再溢出，需要清除效果
+            if (!dockEnabled) resetAllTabs();
         });
-
-        // 图例拖动
-        const legend = document.getElementById('legend');
-        let dragging = false, startY, startTop;
-        legend.addEventListener('mousedown', e => {
-            dragging = true;
-            startY = e.clientY;
-            startTop = parseInt(window.getComputedStyle(legend).top, 10) || 80;
-            e.preventDefault();
-        });
-        window.addEventListener('mousemove', e => {
-            if (!dragging) return;
-            const dy = e.clientY - startY;
-            let newTop = startTop + dy;
-            newTop = Math.max(0, Math.min(window.innerHeight - legend.offsetHeight, newTop));
-            legend.style.top = newTop + 'px';
-        });
-        window.addEventListener('mouseup', () => { dragging = false; });
     }
 
+    // ---------- 同步标签栏宽度 ----------
+    function syncTabBarWidth() {
+        if (window.innerWidth <= 768) return;
+        const activeCard = document.querySelector('.device-card.active');
+        if (activeCard) {
+            tabBar.style.width = activeCard.offsetWidth + 'px';
+        }
+    }
+
+    // ---------- 启动 ----------
     buildAll();
     bindEvents();
     document.documentElement.style.fontSize = fontScale + 'rem';
