@@ -79,17 +79,20 @@ modification() {
             sed -i "s/PKG_USE_MIPS16:=0/PKG_BUILD_FLAGS:=no-mips16/w /dev/stdout" "$0"
         fi' {} \;
     echo
-    echo 'luci-app-vsftpd 定义了一级菜单 <nas>'
+
+    # 修改luci应用一级菜单入口
+    echo '一级菜单 <NAS>'
+    change_entry services nas feeds/kenzo/luci-app-vsftpd
     change_entry services nas feeds/luci/applications/luci-app-aria2
     change_entry services nas feeds/luci/applications/luci-app-hd-idle
-    # change_entry services nas feeds/luci/applications/luci-app-ksmbd  # <nas> menu defined by vsftpd; ksmbd may not be enabled in clean/basic
+    change_entry services nas feeds/luci/applications/luci-app-ksmbd
     change_entry services nas feeds/luci/applications/luci-app-transmission
 
     echo
     echo 'luci-app-n2n 定义了一级菜单 <VPN>'
+    change_entry services vpn feeds/kenzo/other/lean/luci-app-nps
     change_entry services vpn feeds/kenzo/luci-app-npc
     change_entry services vpn feeds/kenzo/luci-app-udp2raw
-    change_entry services vpn package/immortalwrt/luci-app-nps
     change_entry services vpn package/luci-app-tinyfecvpn
     # change_entry services vpn package/luci-app-kcptun
 
@@ -102,11 +105,12 @@ modification() {
 add_packages() {
     #=========================================
     # 两种方式：
-    # M1. 拉取软件源码包放到feeds文件夹，如luci-app放到feeds/luci/
-    # M2. 拉取软件源码包放到package文件夹，可以参考feeds再分源创建不同的文件夹
+    # M1. 通过./scripts/feeds update拉取到feeds文件夹，再通过./scripts/feeds install安装到package文件夹
+    # M2. 直接把包放在package文件夹下（需要自己处理好依赖关系），不使用feeds机制（不更新索引，不安装）
     # 
-    # 大概原理：
-    # 1. ./script/feeds install时会将feeds中的包在package/feeds中创建硬链接
+    # 说明：
+    # ./script/feeds install时会将feeds中的包在package/feeds中创建硬链接，并不会复制文件
+    # 因此 M1 和 M2 方式在 package 目录下的表现是一样的
     # 
     # 注意：
     # 1. luci包须include feeds/luci.mk，某些包(如immortalwrt)引用的luci.mk是相对路径的，需要修正
@@ -126,47 +130,43 @@ add_packages() {
     echo
 
     echo '## From coolsnowwolf'
-    echo '== 从酷雪狼(lean)那里借个自动外存挂载 automount, luci-app-unblockmusic'
+    echo '== 从酷雪狼(lean)那里借个自动外存挂载 automount。luci-app-unblockmusic 已通过 kenzo->coolsnowwolf 间接引用'
+    # https://github.com/coolsnowwolf/luci/tree/master/applications/luci-app-unblockmusic
+    echo -e '备注：\ncoolsnowwolf的unblockmusic支持云解锁、Go和Nodejs\nUnblockNeteaseMusic的luci-app-unblockneteasemusic不支持Go'
     # https://github.com/coolsnowwolf/lede/tree/master/package/lean/automount
     wget --content-disposition --no-verbose https://codeload.github.com/coolsnowwolf/lede/zip/refs/heads/master
     unzip lede-master.zip lede-master/package/lean/automount/*
     mv -v lede-master/package/lean ./
     rm -rf lede-master lede-master.zip
-    # https://github.com/coolsnowwolf/luci/tree/master/applications/luci-app-unblockmusic
-    wget --content-disposition --no-verbose https://codeload.github.com/coolsnowwolf/luci/zip/refs/heads/master
-    unzip luci-master.zip luci-master/applications/luci-app-unblockmusic/*
-    mv -v luci-master/applications/luci-app-unblockmusic ./lean/
-    rm -rf luci-master luci-master.zip
-    echo -e '备注：\ncoolsnowwolf的unblockmusic支持云解锁、Go和Nodejs\nUnblockNeteaseMusic的luci-app-unblockneteasemusic不支持Go'
     echo
 
     echo '## From immortalwrt'
-    echo '== 从天灵那里借个 luci-app-n2n, luci-app-nps, luci-app-vsftpd'
+    echo '== 从天灵那里借个 luci-app-n2n。luci-app-nps, luci-app-vsftpd 已通过 kenzo->immortalwrt 间接引用'
     # https://github.com/immortalwrt/luci/blob/master/applications/*
     wget --content-disposition --no-verbose https://codeload.github.com/immortalwrt/luci/zip/refs/heads/master
-    unzip luci-master.zip luci-master/applications/luci-app-n2n/* luci-master/applications/luci-app-nps/* luci-master/applications/luci-app-vsftpd/*
+    unzip luci-master.zip luci-master/applications/luci-app-n2n/*
     mv -v luci-master/applications ./immortalwrt
     rm -rf luci-master luci-master.zip
-    echo '== 还有依赖 n2n，以及 Yu Wang 的 tinyfecvpn、udp2raw'
+    echo '== 还有依赖 n2n，以及 Yu Wang 的 tinyfecvpn。udp2raw 已通过 kenzo->immortalwrt 间接引用'
     # https://github.com/immortalwrt/packages/blob/master/*
     wget --content-disposition --no-verbose https://codeload.github.com/immortalwrt/packages/zip/refs/heads/master
-    unzip packages-master.zip packages-master/net/n2n/* packages-master/net/tinyfecvpn/* packages-master/net/udp2raw/*
+    unzip packages-master.zip packages-master/net/n2n/* packages-master/net/tinyfecvpn/*
     mv -v packages-master/net ./immortalwrt/net
     rm -rf packages-master packages-master.zip
     echo '[MOD] 在有nftables的设备上好像不需要添加防火墙规则，应用 n2n.init.patch'
     patch immortalwrt/net/n2n/files/n2n.init "${GITHUB_WORKSPACE}/patches/n2n.init.patch"
-    # echo '从 Hyy2001X 那里借一个改好的 luci-app-npc(kenzo中已间接引用)'
+    # echo '从 Hyy2001X 那里借一个改好的 luci-app-npc(kenzo已间接引用)'
     # echo '还有依赖 nps(kenzo中已引用coolsnowwolf源)'
     echo
 
     echo '## From OTHERS'
-    echo '== 从 lisaac 那里加载 luci-app-diskman'
-    wget -nv https://raw.githubusercontent.com/lisaac/luci-app-diskman/master/applications/luci-app-diskman/Makefile -P luci-app-diskman
-    echo
+    # echo '== 从 lisaac 那里加载 luci-app-diskman (已通过 kenzo->immortalwrt->lisaac 间接引用)'
+    # wget -nv https://raw.githubusercontent.com/lisaac/luci-app-diskman/master/applications/luci-app-diskman/Makefile -P luci-app-diskman
+    # echo
     echo '== 从 douo 那里拉取 tinyfecvpn 的 GUI'
     git clone --depth 1 https://github.com/douo/luci-app-tinyfecvpn.git
     # echo
-    # echo '== 从 kuoruan 那里拉取 kcptun 的 GUI'
+    # echo '== 从 kuoruan 那里拉取 kcptun 的 GUI'(过于老旧，与现在的 kcptun 存在冲突，不使用)
     # git clone --depth 1 https://github.com/kuoruan/luci-app-kcptun.git
 
     # 修正luci依赖
