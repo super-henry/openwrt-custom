@@ -78,21 +78,6 @@ modification() {
             echo -n "[$0] "
             sed -i "s/PKG_USE_MIPS16:=0/PKG_BUILD_FLAGS:=no-mips16/w /dev/stdout" "$0"
         fi' {} \;
-
-    # 修改入口
-    change_entry() {
-        [ "$#" -lt 3 ] && echo "[ch_entry_error] 需要至少3个参数：旧入口、新入口和目录路径" && return 1
-        [ ! -d "$3" ] && echo "目录不存在：$3" && return 1
-        
-        local old_entry="$1"
-        local new_entry="$2"
-        echo -e "\n[MOD] 将 $(echo "$3" | grep -o 'luci-app[^/]*') 从 <$old_entry> 移动到 <$new_entry> [$3]"
-        
-        find "$3" ! -path "*.svn*" -type f \
-            -exec grep -q "$old_entry" {} \; -exec \
-                sh -c 'echo "\n== 修改入口记录: [$0]"; sed -i "s/$1/$2/w /dev/stdout" "$0"' \
-                    {} "$old_entry" "$new_entry" \;
-    }
     echo
     echo 'luci-app-vsftpd 定义了一级菜单 <nas>'
     change_entry services nas feeds/luci/applications/luci-app-aria2
