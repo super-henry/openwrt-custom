@@ -31,12 +31,16 @@ modification() {
     find -type f -path '*/luci-app-clash/Makefile' -print -exec sed -i 's/openssl/mbedtls/w /dev/stdout' {} \;
 
     echo
-    echo '[MOD] 移除 luci-theme-argon 对 wget 的依赖'
+    echo '[MOD] 更换 luci-app-easymesh 的依赖 openssl 为 mbedtls'
+    find -type f -path '*/luci-app-easymesh/Makefile' -print -exec sed -i 's/openssl/mbedtls/w /dev/stdout' {} \;
+
+    echo
+    echo '[MOD] 去除 luci-theme-argon 对 wget 的依赖'
     find -type f -path '*/luci-theme-argon/Makefile' -print -exec sed -i 's/+wget\b/+wget-any/w /dev/stdout' {} \;
 
     echo
-    echo '[MOD] 更换 luci-app-easymesh 的依赖 openssl 为 mbedtls'
-    find -type f -path '*/luci-app-easymesh/Makefile' -print -exec sed -i 's/openssl/mbedtls/w /dev/stdout' {} \;
+    echo '[MOD] 去除 n2n 的 OpenSSL 依赖 '
+    find -type f -path '*/n2n/Makefile' -print -exec sed -i -e 's/+libopenssl \+//' -e 's/USE_OPENSSL=ON/USE_OPENSSL=OFF/' -e 'w /dev/stdout' {} \;
 
     echo
     echo '[MOD] 更换 ttyd 的依赖 openssl 为 mbedtls'
