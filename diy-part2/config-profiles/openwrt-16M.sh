@@ -168,12 +168,12 @@ CONFIG_PACKAGE_luci-app-adguardhome=m
 # ----------Func_luci-app-tinyproxy
 CONFIG_PACKAGE_luci-app-tinyproxy=y
 # ----------Func_luci-app-wechatpush
-CONFIG_PACKAGE_luci-app-wechatpush=y
+CONFIG_PACKAGE_luci-app-wechatpush=m
 # ----------Func_unblockmusic_Go
-CONFIG_PACKAGE_luci-app-unblockmusic=y
-CONFIG_PACKAGE_luci-app-unblockmusic_INCLUDE_UnblockNeteaseMusic_Go=y
+CONFIG_PACKAGE_luci-app-unblockmusic=m
+CONFIG_PACKAGE_luci-app-unblockmusic_INCLUDE_UnblockNeteaseMusic_Go=m
 # ----------Test_luci-app-store
-CONFIG_PACKAGE_luci-app-store=y
+CONFIG_PACKAGE_luci-app-store=m
 
 EOF
 }
