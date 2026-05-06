@@ -81,7 +81,8 @@ modification() {
     echo
 
     # 修改luci应用一级菜单入口
-    echo '一级菜单 <NAS>'
+    echo '定义一级菜单 <NAS>'
+    patch feeds/luci/modules/luci-base/root/usr/share/luci/menu.d/luci-base.json "${GITHUB_WORKSPACE}/patches/luci-base.patch"
     change_entry services nas feeds/kenzo/luci-app-vsftpd
     change_entry services nas feeds/luci/applications/luci-app-aria2
     change_entry services nas feeds/luci/applications/luci-app-hd-idle

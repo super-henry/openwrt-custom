@@ -1,0 +1,18 @@
+--- luci-base.json	2026-05-06 13:06:59.968511633 +0800
++++ luci-base.json	2026-05-06 13:08:30.204517261 +0800
+@@ -34,6 +34,15 @@
+ 
+ 	"admin/services": {
+ 		"title": "Services",
++		"order": 30,
++		"action": {
++			"type": "firstchild",
++			"recurse": true
++		}
++	},
++
++	"admin/nas": {
++		"title": "NAS",
+ 		"order": 40,
+ 		"action": {
+ 			"type": "firstchild",
