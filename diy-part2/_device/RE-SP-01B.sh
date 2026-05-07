@@ -61,5 +61,5 @@ target_patch() {
     
     # network中增加MAC地址计算逻辑
     echo '[+TARGET] 应用 02_network.re-sp-01b.patch'
-    patch target/linux/ramips/mt7621/base-files/etc/board.d/02_network "${PATCH_DIR}/02_network.re-sp-01b.patch"
+    patch --no-backup-if-mismatch target/linux/ramips/mt7621/base-files/etc/board.d/02_network "${PATCH_DIR}/02_network.re-sp-01b.patch"
 }
