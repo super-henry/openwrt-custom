@@ -23,9 +23,6 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      repository-dispatch: write
 
     steps:
 
@@ -53,7 +50,6 @@ jobs:
       with:
         token: ${{ secrets.ACTIONS_TRIGGER_PAT }}
         event-type: Source Code Update
-        repository: ${{ github.repository }}
 
     - name: Delete workflow runs
       uses: Mattraks/delete-workflow-runs@main
