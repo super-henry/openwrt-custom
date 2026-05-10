@@ -340,8 +340,14 @@ jobs:
 
           # 补全默认值
           make defconfig
-          # 尝试解决一些已知的冲突项
+          
+          ###########################################
+          # 自动修复脚本换行符 + 禁用 mentohust
+          ###########################################
+          sed -i 's/\r$//' "$GITHUB_WORKSPACE/scripts/conflict-clamer.sh"
+          echo "CONFIG_PACKAGE_mentohust=n" >> .config
           bash "$GITHUB_WORKSPACE/scripts/conflict-clamer.sh"
+          
           # 分析配置文件是否包含补丁
           subset_check=$(comm -23 <(sed '/@/d' "${patch_file}" | sort | uniq) <(sort .config | uniq) | tee .notfound)
           if [[ -z $subset_check ]]; then
